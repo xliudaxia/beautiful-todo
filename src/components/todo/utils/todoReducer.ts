@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 export interface ToDoItemProps {
   id: number;
@@ -6,11 +6,12 @@ export interface ToDoItemProps {
   updateTime: string;
 }
 interface StateProps {
-  todoList: ToDoItemProps | ToDoItemProps[];
+  todoList: ToDoItemProps[] | [];
 }
 interface ActionProps {
-  type: "add" | "delete" | "update" | "query";
-  value?: ToDoItemProps | ToDoItemProps[];
+  type: "add" | "delete" | "update" | "query" | "reset";
+  value: ToDoItemProps;
+  initValue?: ToDoItemProps[];
 }
 
 /* 
@@ -21,6 +22,12 @@ todoreducer承载的能力有：
 
 type TodoReducer<STATE, ACTION> = React.Reducer<STATE, ACTION>;
 
+export function initState(o: () => ToDoItemProps[]): StateProps {
+  return {
+    todoList: o() ? o() : [],
+  };
+}
+
 const todoReducer: TodoReducer<StateProps, ActionProps> = (
   state,
   { type, value }
@@ -30,6 +37,16 @@ const todoReducer: TodoReducer<StateProps, ActionProps> = (
       return {
         ...state,
         todoList: [...state.todoList, value],
+      };
+    case "delete":
+      return {
+        ...state,
+        todoList: state.todoList.filter((item) => item.id !== value.id),
+      };
+    case "reset":
+      return {
+        ...state,
+        todoList: [],
       };
     default:
       return state;

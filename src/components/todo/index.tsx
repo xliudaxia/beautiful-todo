@@ -1,34 +1,51 @@
 /*
  * @Author: jessLiu
  * @Date: 2022-03-20 17:53:22
- * @LastEditTime: 2022-03-23 09:29:30
+ * @LastEditTime: 2022-03-27 16:24:09
  * @LastEditors: liuwenhao
  * @Description:Todo APP
  * @FilePath: /beautiful-todo/src/components/todo/index.tsx
  */
-import React, { ChangeEvent, useState, FC } from "react";
+import React, { ChangeEvent, useState, FC, useReducer, useEffect } from "react";
 import Logo from "../../logo.svg";
 import TodoItem from "./components/TodoItem";
+import todoReducer, { initState, ToDoItemProps } from "./utils/todoReducer";
+import useLocalStorage from "./hooks/useLocalStorage";
 import "./index.css";
 
 const ToDo: FC = () => {
-  const [list, setList] = useState([
-    {
-      id: 1,
-      text: "清理房间",
-    },
-    { id: 2, text: "做家务" },
-  ]);
+  const [localList, setLocalList] = useLocalStorage<ToDoItemProps[]>(
+    "todoList",
+    []
+  );
+  const [{ todoList }, Dispatch] = useReducer(
+    todoReducer,
+    initState(() => {
+      if (localList && localList.length !== 0) {
+        return localList as ToDoItemProps[];
+      }
+      return [];
+    })
+  );
+  useEffect(() => {
+    setLocalList(todoList);
+  }, [todoList]);
+
+  // todo内容存放
   const [todo, setToDo] = useState<string>("");
+  // 错误提示
   const [showError, setShowError] = useState(false);
 
+  // 生成ID方法，reducer
   const generateId = () => {
-    if (list && list.length) {
-      return Math.max(...list.map((t) => t.id)) + 1;
+    if (todoList && todoList.length) {
+      return Math.max(...todoList.map((t) => t.id)) + 1;
     } else {
       return 1;
     }
   };
+
+  // 显示错误方法
   const displayError = () => {
     setShowError(true);
     const clearTimer = setTimeout(() => {
@@ -36,14 +53,21 @@ const ToDo: FC = () => {
     }, 3000);
     return () => clearTimeout(clearTimer);
   };
+
+  // 新增项目方法
   const createNewToDoItem = () => {
     if (!todo) {
       displayError();
       return;
     }
     const newId = generateId();
-    const newToDo = { id: newId, text: todo };
-    setList([...list, newToDo]);
+    const newToDo = { id: newId, title: todo, updateTime: "" };
+    Dispatch({
+      type: "add",
+      value: {
+        ...newToDo,
+      },
+    });
     setToDo("");
   };
   const handleKeyPress = (e: any) => {
@@ -54,16 +78,25 @@ const ToDo: FC = () => {
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
     setToDo(e.target.value);
   };
+  // 删除todo方法 Reducer
   const deleteItem = (id: number) => {
-    setList(list.filter((item) => item.id !== id));
+    Dispatch({
+      type: "delete",
+      value: {
+        id: id,
+        title: "",
+        updateTime: "",
+      },
+    });
   };
+
   return (
     <div className="ToDo">
       <img src={Logo} alt="ToDo APP" className="Logo" />
       <h1 className="ToDo-Header">简 ToDo</h1>
       <div className="ToDo-Container">
         <div className="ToDo-Content">
-          {list.map((item) => (
+          {todoList.map((item) => (
             <TodoItem key={item.id} item={item} deleteItem={deleteItem} />
           ))}
         </div>
