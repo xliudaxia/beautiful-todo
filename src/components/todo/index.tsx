@@ -1,11 +1,3 @@
-/*
- * @Author: jessLiu
- * @Date: 2022-03-20 17:53:22
- * @LastEditTime: 2022-03-27 16:24:09
- * @LastEditors: liuwenhao
- * @Description:Todo APP
- * @FilePath: /beautiful-todo/src/components/todo/index.tsx
- */
 import React, { ChangeEvent, useState, FC, useReducer, useEffect } from "react";
 import Logo from "../../logo.svg";
 import TodoItem from "./components/TodoItem";
@@ -27,16 +19,15 @@ const ToDo: FC = () => {
       return [];
     })
   );
+
   useEffect(() => {
     setLocalList(todoList);
-  }, [todoList]);
+  }, [todoList, setLocalList]);
 
-  // todo内容存放
   const [todo, setToDo] = useState<string>("");
   // 错误提示
   const [showError, setShowError] = useState(false);
 
-  // 生成ID方法，reducer
   const generateId = () => {
     if (todoList && todoList.length) {
       return Math.max(...todoList.map((t) => t.id)) + 1;
@@ -45,7 +36,6 @@ const ToDo: FC = () => {
     }
   };
 
-  // 显示错误方法
   const displayError = () => {
     setShowError(true);
     const clearTimer = setTimeout(() => {
@@ -54,7 +44,6 @@ const ToDo: FC = () => {
     return () => clearTimeout(clearTimer);
   };
 
-  // 新增项目方法
   const createNewToDoItem = () => {
     if (!todo) {
       displayError();
@@ -70,15 +59,17 @@ const ToDo: FC = () => {
     });
     setToDo("");
   };
+
   const handleKeyPress = (e: any) => {
     if (e.key === "Enter") {
       createNewToDoItem();
     }
   };
+
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
     setToDo(e.target.value);
   };
-  // 删除todo方法 Reducer
+
   const deleteItem = (id: number) => {
     Dispatch({
       type: "delete",
