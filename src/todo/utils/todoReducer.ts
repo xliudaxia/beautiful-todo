@@ -2,8 +2,8 @@ import React from "react";
 
 export interface ToDoItemProps {
   id: number;
-  title: string;
-  updateTime: string;
+  title?: string;
+  updateTime?: string;
 }
 interface StateProps {
   todoList: ToDoItemProps[] | [];
@@ -11,7 +11,7 @@ interface StateProps {
 interface ActionProps {
   type: "add" | "delete" | "update" | "query" | "reset";
   value: ToDoItemProps;
-  initValue?: ToDoItemProps[];
+  initValue?: ToDoItemProps[]|[];
 }
 
 type TodoReducer<STATE, ACTION> = React.Reducer<STATE, ACTION>;

@@ -14,7 +14,7 @@ import "./index.css";
 interface TodoItemProps {
   item: {
     id: number;
-    title: string;
+    title?: string;
   };
   deleteItem: (id: number) => void;
 }

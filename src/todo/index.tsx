@@ -58,12 +58,11 @@ const ToDo: FC = () => {
       return;
     }
     const newId = generateId();
-    const newToDo = { id: newId, title: todo, updateTime: "" };
     
     dispatch({
       type: "add",
       value: {
-        ...newToDo,
+        ...{ id: newId, title: todo, updateTime: "" },
       },
     });
     setToDo("");
@@ -85,8 +84,6 @@ const ToDo: FC = () => {
       type: "delete",
       value: {
         id: id,
-        title: "",
-        updateTime: "",
       },
     });
   };
