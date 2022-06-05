@@ -14,12 +14,6 @@ interface ActionProps {
   initValue?: ToDoItemProps[];
 }
 
-/* 
-todoreducer承载的能力有：
-1.待办事项的增删改查
-2.待办事项的localstorage缓存（后期接入维格表）
-*/
-
 type TodoReducer<STATE, ACTION> = React.Reducer<STATE, ACTION>;
 
 export function initState(o: () => ToDoItemProps[]): StateProps {

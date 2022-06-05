@@ -1,16 +1,22 @@
 import React, { ChangeEvent, useState, FC, useReducer, useEffect } from "react";
-import Logo from "../../logo.svg";
+import Logo from "../logo.svg";
 import TodoItem from "./components/TodoItem";
 import todoReducer, { initState, ToDoItemProps } from "./utils/todoReducer";
 import useLocalStorage from "./hooks/useLocalStorage";
 import "./index.css";
 
 const ToDo: FC = () => {
+  const [todo, setToDo] = useState<string>("");
+  // 错误提示
+  const [showError, setShowError] = useState(false);
+  // localStorage数据持久化
   const [localList, setLocalList] = useLocalStorage<ToDoItemProps[]>(
     "todoList",
     []
   );
-  const [{ todoList }, Dispatch] = useReducer(
+
+  // 初始化数据
+  const [{ todoList }, dispatch] = useReducer(
     todoReducer,
     initState(() => {
       if (localList && localList.length !== 0) {
@@ -20,14 +26,13 @@ const ToDo: FC = () => {
     })
   );
 
+  // 每次操作数据时更新到localStorage
   useEffect(() => {
     setLocalList(todoList);
   }, [todoList, setLocalList]);
 
-  const [todo, setToDo] = useState<string>("");
-  // 错误提示
-  const [showError, setShowError] = useState(false);
 
+// 生成编号
   const generateId = () => {
     if (todoList && todoList.length) {
       return Math.max(...todoList.map((t) => t.id)) + 1;
@@ -36,6 +41,7 @@ const ToDo: FC = () => {
     }
   };
 
+  // 错误信息展示
   const displayError = () => {
     setShowError(true);
     const clearTimer = setTimeout(() => {
@@ -44,6 +50,8 @@ const ToDo: FC = () => {
     return () => clearTimeout(clearTimer);
   };
 
+
+  // 创建新项目
   const createNewToDoItem = () => {
     if (!todo) {
       displayError();
@@ -51,7 +59,8 @@ const ToDo: FC = () => {
     }
     const newId = generateId();
     const newToDo = { id: newId, title: todo, updateTime: "" };
-    Dispatch({
+    
+    dispatch({
       type: "add",
       value: {
         ...newToDo,
@@ -59,6 +68,7 @@ const ToDo: FC = () => {
     });
     setToDo("");
   };
+
 
   const handleKeyPress = (e: any) => {
     if (e.key === "Enter") {
@@ -71,7 +81,7 @@ const ToDo: FC = () => {
   };
 
   const deleteItem = (id: number) => {
-    Dispatch({
+    dispatch({
       type: "delete",
       value: {
         id: id,
